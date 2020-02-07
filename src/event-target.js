@@ -1,33 +1,35 @@
-export class Player {
+/* 
+  EventTarget Polyfill
+  See also: 
+  https://developer.mozilla.org/en-US/docs/Web/API/EventTarget#Example
+*/
 
-    play(song) {
-        this.currentlyPlayingSong = song;
-        this.isPlaying = true;
-    }
+// Feature detection
+try {
+    // Try to create a new instance
+    const eventTarget = new EventTarget()
+} catch (e) {
+    // Error occurred, thus we have to use the polyfill:
+    window.EventTarget = class {
 
-    pause() {
-        this.isPlaying = false;
-    }
-
-    resume() {
-        if (this.isPlaying) {
-            throw new Error("song is already playing");
+        constructor() {
+            // a DOM element           
+            this._$el = document.createElement('a');
         }
 
-        this.isPlaying = true;
+        addEventListener(type, handler) {
+            // bind handler to our DOM element
+            return this._$el.addEventListener(type, handler);
+        }
+
+        removeEventListener(type, handler) {
+            // bind handler to our DOM element
+            return this._$el.removeEventListener(type, handler);
+        }
+
+        dispatchEvent(event) {
+            // dispatch event on our DOM element
+            this._$el.dispatchEvent(event);
+        }
     }
-
-    makeFavorite() {
-        this.currentlyPlayingSong.persistFavoriteStatus(true);
-    }
-
-}
-
-export class Song {
-
-    persistFavoriteStatus(value) {
-        // something complicated
-        throw new Error("not yet implemented");
-    }
-
 }
